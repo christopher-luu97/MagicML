@@ -1,6 +1,7 @@
 # MagicML
 
 **This repo hosts the code required for the development of an "All-in-one" software application for machine learning use cases**
+
 I call this application MagicML as I want this tool to be ambitious in being able to handle many AI use cases all with a single or few clicks.
 
 **Goal**
