@@ -4,7 +4,7 @@
 
 I call this application MagicML as I want this tool to be ambitious in being able to handle many AI use cases all with a single or few clicks.
 
-**Goal**
+**Goal: **
 Develop a software application that performs "auto-ML" similar to the capability seen in ML.NET but extended for additional AI such as speech-to-text transcription.
 Should handle tabular data, audio data and more!
 
