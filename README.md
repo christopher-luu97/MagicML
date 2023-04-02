@@ -16,7 +16,8 @@ Should handle tabular data, audio data and more!
 **Plan Breakdown** : 
 1.  A. Develop initial GUI and identify key buttons 
 2.  A. Start with scikit based ML for tabular data for backend logic 3. Define and build database storage
-3.  A. Schema and Data modelling 4. Create and build appropriate visualisations for end user view
+3.  A. Schema and Data modelling 
+4.  A. Create and build appropriate visualisations for end user view such as correlation heap maps, feature importance etc.
 
 **Down the line features**: 
 - Implement speech AI capabilities which I have experience in professionally.
