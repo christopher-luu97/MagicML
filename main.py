@@ -50,6 +50,7 @@ if __name__ == "__main__":
     sp.show()
     sp.progress()
     w = Window()
+    w.showMaximized()
     w.show()
     sp.finish(w)
     sys.exit(app.exec())
