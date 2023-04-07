@@ -69,11 +69,13 @@
      <string>Info</string>
     </property>
     <addaction name="actionHelp"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuErrors">
     <property name="title">
      <string>Errors</string>
     </property>
+    <addaction name="actionOpen_Errors_Folder"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuInfo"/>
@@ -98,6 +100,16 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionOpen_Errors_Folder">
+   <property name="text">
+    <string>Open Errors Folder</string>
    </property>
   </action>
  </widget>

@@ -4,15 +4,15 @@ import logging
 import subprocess as sp
 import json
 
-from PyQt6.QtWidgets import ( QLabel, QPushButton, QFileDialog, 
-                             QStatusBar,QGroupBox, QTextBrowser)
+from PyQt6.QtWidgets import (QFileDialog)
 from PyQt6.QtGui import QAction
 from PyQt6 import uic
 from PyQt6.QtCore import *
 
-from dialogs import (aboutDialog, noFileDialog, helpDialog, 
+from .dialogs import (aboutDialog, noFileDialog, helpDialog, 
                      errorDialog, outputFileDialog, metaDataDialog)
-from signals import PageWindow
+from .signals import PageWindow
+from .splashWindow import splashWindow
 
 def except_hook(cls, exception, traceback):
     """
@@ -34,99 +34,43 @@ class MainWindow(PageWindow):
     def __init__(self):
 
         super(MainWindow, self).__init__()  # Inherit from QMainWindow
+        # self.init_splash_window()
+        self.init_main_window()
 
-        # load ui for the main window
+    def init_main_window(self):
+        """
+        Method to initialize the main window
+        """
         basedir = os.getcwd() # os.path.dirname(sys.argv[0])
         ui_dir = os.path.join(basedir, 'ui', 'mainWindow.ui')
         
         ui = uic.loadUi(ui_dir, self)
         
+
         # Menu bar
-        self.about = self.findChild(QAction, 'action_About')
+        self.about = self.findChild(QAction, 'actionAbout')
         self.about.triggered.connect(self.__open_about_window)
 
-        self.help = self.findChild(QAction, 'action_Help')
+        self.help = self.findChild(QAction, 'actionHelp')
         self.help.triggered.connect(self.__open_help_window)
 
-        self.open_file_menubar = self.findChild(QAction, 'action_Open')
+        self.open_file_menubar = self.findChild(QAction, 'actionOpen')
         self.open_file_menubar.triggered.connect(self.__select_file_clicker)
 
-        self.close_file_menubar = self.findChild(QAction, 'action_Close')
+        self.close_file_menubar = self.findChild(QAction, 'actionClose')
         self.close_file_menubar.triggered.connect(self.__close_file_action)
 
         self.error_menubar = self.findChild(QAction, 'actionOpen_Errors_Folder')
         self.error_menubar.triggered.connect(self.__open_error_folder)
 
-        self.exit_application_menubar = self.findChild(QAction, 'action_Exit')
+        self.exit_application_menubar = self.findChild(QAction, 'actionExit')
         self.exit_application_menubar.triggered.connect(self.close) # Terminate
-
-        # Definitions here, widgets, variables etc.,
-        self.see_more_button = self.findChild(QPushButton, 'openMetadata')
-        self.open_output_folder_button = self.findChild(QPushButton, 'openOutputFolder')
-        self.open_output_file_button = self.findChild(QPushButton, 'openOutputFile')
-        self.transcription_output_groupbox = self.findChild(QGroupBox, 'output_groupBox')
-        
-        self.settings_group_box = self.findChild(QGroupBox, 'Settings_groupBox')       
-        self.execution_details_group_box = self.findChild(QGroupBox, 'executionDetails_groupBox')
-        self.sidebar_background = self.findChild(QLabel, 'sidebarBackground')
-        self.sidebar_divider = self.findChild(QLabel, 'divider')
-        self.settings_button = self.findChild(QPushButton, 'settings_push_button')
-        self.info_button = self.findChild(QPushButton, 'info_push_button')
-        self.metadata_label = self.findChild(QGroupBox, 'file_metadata_groupbox')
-        self.sidebar_counter = 0
-        self.settings_button.clicked.connect(self.__hide_settings)
-
-        self.info_button.clicked.connect(self.__open_about_window)
-
-        # Set default button to be disabled
-        self.open_output_folder_button.setEnabled(False)
-        self.open_output_file_button.setEnabled(False)
-
-        self.title_label = self.findChild(
-            QLabel, 'titleLabel'
-        )
-        self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.file_locations = self.findChild(
-            QLabel, 'fileLocations')  # Print file location
-
-        self.file_locations_2 = self.findChild(
-            QLabel, 'file_locations_2') 
-
-        self.file_output_location = self.findChild(
-            QLabel, 'file_output_location') 
-
-        self.file_metadata = self.findChild(
-            QLabel, 'fileMetadata'
-        )
-
-        self.execution_start = self.findChild(
-            QLabel, 'executionStart')  # Print exeuciton start time
-
-        self.total_execution_time = self.findChild(
-            QLabel, 'totalExecutionTime')
-
-        self.output_label = self.findChild(QTextBrowser, 'outputLabel')
-
-        self.fname = ''  # Instantiate the filename as an empty string and replace as needed
-
-        # When you hover over things, show the name
-        self.setStatusBar(QStatusBar(self))
-
-        # Trigger event when select file clicked
-        self.select_file_button = self.findChild(QPushButton, 'select_file_button')
-        self.select_file_button.clicked.connect(self.__select_file_clicker)
-        
-        self.see_more_button.clicked.connect(self.__open_metadata_dialog)
-        self.open_output_file_button.clicked.connect(self.__open_output_file_dialog)
-        self.open_output_folder_button.clicked.connect(self.__open_output_folder)
 
         # Have memory of last opened folder here that does not persist across open and closing of application
         self.last_opened_folder = ''
 
         self.worker = None
 
-        self.hide_startup()
         # Show the app
         ui.show()
 

@@ -9,7 +9,7 @@ import subprocess as sp
 
 from authoring.author import Author
 from authoring.author_metadata import magic_metadata
-from signals import dialogCommunicate
+from .signals import dialogCommunicate
 
 class generalDialog(QDialog):
     """

@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (QMainWindow, QApplication, QStackedWidget)
 from PyQt6.QtCore import *
 
 from src.mainWIndow import MainWindow
+from src.splashWindow import splashWindow
 from src.signals import PageWindow
 
 class Window(QMainWindow):
@@ -35,7 +36,6 @@ class Window(QMainWindow):
             self.stacked_widget.setCurrentWidget(widget)
             self.setWindowTitle(widget.windowTitle())
 
-
 if __name__ == "__main__":
     import sys
 
@@ -46,6 +46,10 @@ if __name__ == "__main__":
     with open(style_dir, 'r') as f:
         style = f.read()
     app.setStyleSheet(style)
+    sp = splashWindow()
+    sp.show()
+    sp.progress()
     w = Window()
     w.show()
+    sp.finish(w)
     sys.exit(app.exec())
