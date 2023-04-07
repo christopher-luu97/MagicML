@@ -1,0 +1,5 @@
+{
+  "Audio": ["wav", "mp3", "mp4"],
+  "Text": ["txt"],
+  "Excel": ["xls", "xlsx", "csv"]
+}
