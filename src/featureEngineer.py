@@ -5,6 +5,8 @@ from sklearn.preprocessing import (MinMaxScaler, StandardScaler, Normalizer,
                                    PolynomialFeatures, LabelEncoder, OneHotEncoder)
 import numpy as np
 
+from tsfresh import extract_relevant_features #tsfresh for time series
+
 class FeatureEngineerPD():
     """
     Class to perform all the necessary feature engineering as needed
@@ -174,4 +176,57 @@ class FeatureEngineerPD():
             return df
         else:
             return df.groupby([category_cols])["id"].count().reset_index(name="count")
+    
+    def date_extractor(self, df: pd.DataFrame, date_col:str) -> pd.DataFrame:
+        """
+        Create multiple features based off date column
+
+        Args:
+            df (pd.DataFrame): Input dataframe
+            date_col (str): Column that hosts date format. 
+
+        Returns:
+            df (pd.DataFrame): Dataframe with additional features
+        """
+        # Needs more thinking about letting user select these otherwise data explodes a bit.
+        df.loc[: 'year'] = df[date_col].dt.year
+        df.loc[: 'month'] = df[date_col].dt.month
+        df.loc[: 'quarter'] = df[date_col].dt.quarter
+        df.loc[: 'day_of_week'] = df[date_col].dt.dayofweek
+        return df
+    
+    def aggregate_dates(self, df:pd.DataFrame, target_var:str, col_name:str) -> pd.DataFrame:
+        """
+        Combine extracted time series features with aggregate features of target var
+        Output can be joined back to main DF via the col_name key
+
+        Args:
+            df (pd.DataFrame): Input dataframe
+            target_var (str): Column name of target variable
+            col_name (str): Create aggregate features around col name
+
+        Returns:
+            pd.DataFrame: _description_
+        """
+        aggregates = {}
+        aggregates['year'] = ['nunique', 'mean']
+        aggregates[target_var] = ['sum', 'max', 'min', 'mean']
+
+        return df.groupby(col_name).agg(aggregates)
+    
+    def ts_extract_relevant_features(self, x_df:pd.DataFrame, y_df:pd.DataFrame) -> pd.DataFrame:
+        """
+        Perform the extraction, imputing and filtering at the same time
+
+        Args:
+            x_df (pd.DataFrame): Time series dataframe
+            y_df (pd.DataFrame): Target col
+
+        Returns:
+            pd.DataFrame: _description_
+        """
+        features_filtered_direct = extract_relevant_features(x_df, y_df,
+                                                            column_id='id', column_sort='time')
+        
+        return features_filtered_direct
 

@@ -45,11 +45,19 @@ class DataLoaderPD(DataLoader):
         """
         pass
 
-    def check_nan(self):
+    def check_nan(self, df: pd.DataFrame, col_list:list, fill_na:bool = True) -> pd.DataFrame:
         """
         Check for nan and handle it across all columns and rows
+
+        Args:
+            df (pd.DataFrame): Input dataframe
+            col_list (col): Column name to handle
+            fill_na (bool): Fill NA of given columns to 0. Default set to True.
         """
-        pass
+        if fill_na:
+            for col in col_list:
+                df[col] = df[col].fillna(0) 
+        return df
 
     def check_distribution(self):
         """
@@ -62,6 +70,21 @@ class DataLoaderPD(DataLoader):
         Check for outliers and handle as needed
         """
         pass
+
+    def convert_datetime(self, df: pd.DataFrame, col_list:list) -> pd.DataFrame:
+        """
+        Convert appropriate columns to datetime as necessary
+
+        Args:
+            df (pd.DataFrame): Input dataframe
+            col_list (list): Columns that are datetime
+
+        Returns:
+            df (pd.DataFrame): Dataframe with converted datetime columns
+        """
+        for col in col_list:
+            df.loc[:, col] = df[col].apply(lambda s:pd.to_datetime(s))
+        return df
 
 # To be implemented
 class DataLoaderAudio(DataLoader):
