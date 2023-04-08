@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 from sklearn.preprocessing import (MinMaxScaler, StandardScaler, Normalizer,
-                                   PolynomialFeatures)
+                                   PolynomialFeatures, LabelEncoder, OneHotEncoder)
 import numpy as np
 
 class FeatureEngineerPD():
@@ -117,5 +117,61 @@ class FeatureEngineerPD():
             df[name+"_binned"] = pd.cut(df[name], bins=bins)
     
         return df
+    
+    def label_encode(self, df: pd.DataFrame, category_cols:list) -> pd.DataFrame:
+        """
+        Encode all categorical features as a number
+        Label Encoding is the encoding of choice when we are encoding ordinal variables
+        Ensure that encodings are corresponding with order of categories
+        
+        Args:
+            df (pd.DataFrame): Input dataframe
+            category_cols (list): List of columns that are categorical
 
+        Returns:
+            df (pd.DataFrame): Dataframe with new columns that have the label encoded variables
+        """
+        label_encoder = LabelEncoder()
+        
+        for cat in category_cols:
+            df.loc[:, cat] = label_encoder.fit_transform(df[cat])
+
+        return df
+
+    def onehot_encod(self, df: pd.DataFrame, category_cols:list, sparse:bool = True) -> pd.DataFrame:
+        """
+        One Hot Encoding is a technique where we encode each category as a vector of binary values where 
+            the length of the vector is the number of unique categories in our feature
+
+        Suitable for regression models
+        
+        Args:
+            df (pd.DataFrame): Input dataframe
+            category_cols (list): List of columns that are categorical
+            sparse (bool): Calibrate output of encoder. Default set to True to save memory.
+
+        Returns:
+            df (pd.DataFrame): Dataframe with new columns that have the label encoded variables
+        """
+        oh_encoder = OneHotEncoder(sparse=sparse)
+        for cat in category_cols:
+            df.loc[:, cat] = oh_encoder.fit_transform(df[cat].values.reshape(-1, 1))
+        
+    def cat_to_num(self, df: pd.DataFrame, category_cols:list, single:bool=True) -> pd.DataFrame:
+        """_summary_
+
+        Args:
+            df (pd.DataFrame): Input dataframe
+            category_cols (list): List of columns that are categorical
+            single (bool): Whether to set a single column or multiple from cat to num. Default set to True.
+
+        Returns:
+            pd.DataFrame: _description_
+        """
+        if single:
+            for cat in category_cols:
+                df[cat+"_num"] = df.groupby([cat])["id"].transfrom("count")
+            return df
+        else:
+            return df.groupby([category_cols])["id"].count().reset_index(name="count")
 
