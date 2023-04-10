@@ -1,8 +1,8 @@
 import os
 import pandas as pd
-from .dataloader import DataLoaderPD
-from .calculator import CalculatorPD
-from .model_selector import RegressionModelSelector
+from src.dataloader import DataLoaderPD
+from src.calculator import CalculatorPD
+from src.model_selector import RegressionModelSelector
 
 def test_feature_creation():
     holidays = os.path.join(os.getcwd(), "data","input","holidays.csv")

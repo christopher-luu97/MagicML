@@ -1,0 +1,1 @@
+The references folder is for work I use as reference. Many of these provide the structure for how I go about implementing and building, think of them as the skeleton in which I add the meat to the bones.

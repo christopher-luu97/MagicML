@@ -5,7 +5,7 @@ from sklearn.preprocessing import (MinMaxScaler, StandardScaler, Normalizer,
                                    PolynomialFeatures, LabelEncoder, OneHotEncoder)
 import numpy as np
 
-from tsfresh import extract_relevant_features #tsfresh for time series
+# from tsfresh import extract_relevant_features #tsfresh for time series
 
 class FeatureEngineerPD():
     """
@@ -214,19 +214,19 @@ class FeatureEngineerPD():
 
         return df.groupby(col_name).agg(aggregates)
     
-    def ts_extract_relevant_features(self, x_df:pd.DataFrame, y_df:pd.DataFrame) -> pd.DataFrame:
-        """
-        Perform the extraction, imputing and filtering at the same time
+    # def ts_extract_relevant_features(self, x_df:pd.DataFrame, y_df:pd.DataFrame) -> pd.DataFrame:
+    #     """
+    #     Perform the extraction, imputing and filtering at the same time
 
-        Args:
-            x_df (pd.DataFrame): Time series dataframe
-            y_df (pd.DataFrame): Target col
+    #     Args:
+    #         x_df (pd.DataFrame): Time series dataframe
+    #         y_df (pd.DataFrame): Target col
 
-        Returns:
-            pd.DataFrame: _description_
-        """
-        features_filtered_direct = extract_relevant_features(x_df, y_df,
-                                                            column_id='id', column_sort='time')
+    #     Returns:
+    #         pd.DataFrame: _description_
+    #     """
+    #     features_filtered_direct = extract_relevant_features(x_df, y_df,
+    #                                                         column_id='id', column_sort='time')
         
-        return features_filtered_direct
+    #     return features_filtered_direct
 

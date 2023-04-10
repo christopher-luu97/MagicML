@@ -28,6 +28,9 @@ class DataLoaderPD(DataLoader):
     Args:
         DataLoader (Object): _description_
     """
+    def __init__(self, dev:bool = False):
+        self.dev = dev
+
     def load_data(self, input_dir:str):
         """
         Load csv data into a pandas dataframe
