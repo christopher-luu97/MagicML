@@ -33,7 +33,7 @@ def test_df_isnull(sample_df):
 def test_number_of_outliers(sample_df):
     result = TDProcessor.number_of_outliers(sample_df)
     assert isinstance(result, pd.DataFrame)
-    assert result.shape == (2, 2)
+    assert result.shape == (3, 2)
     assert result.columns.tolist() == ['column', 'count_of_outliers']
     assert result['column'].tolist() == ['A', 'B']
     assert result['count_of_outliers'].tolist() == [0, 0]
