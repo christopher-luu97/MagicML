@@ -18,4 +18,4 @@ jobs:
           pip install -r ${{ github.workspace }}/env/requirements.txt
       - name: Test with pytest
         run: |
-          pytest ${{ github.workspace }}/src/tests/test_tabularDataProcessor.py --doctest-modules --junitxml=junit/test-results.xml
+          pytest ${{ github.workspace }}/tests/test_tabularDataProcessor.py --doctest-modules --junitxml=junit/test-results.xml
