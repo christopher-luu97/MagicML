@@ -1,0 +1,21 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ["3.8", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ${{ github.workspace }}/env/requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest ${{ github.workspace }}/src/tests/test_tabularDataProcessor.py --doctest-modules --junitxml=junit/test-results.xml
