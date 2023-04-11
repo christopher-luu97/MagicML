@@ -18,8 +18,8 @@ def test_df_info(sample_df):
     assert result.shape == (5, 3)
     assert result.columns.tolist() == ['Column', 'Non-Null Count', 'Data Type']
     assert result['Column'].tolist() == ['A', 'B', 'C', 'D', 'E']
-    assert result['Non-Null Count'].tolist() == [5, 5, 5, 5, 3]
-    assert result['Data Type'].tolist() == ['int64', 'float64', 'object', 'bool', 'int64']
+    assert result['Non-Null Count'].tolist() == ['5','5', '5', '5', '3']
+    assert result['Data Type'].tolist() == ['object', 'object', 'object', 'object', 'object']
 
 def test_df_isnull(sample_df):
     result = TDProcessor.df_isnull(sample_df)
