@@ -74,6 +74,7 @@ class DataCheckerPage(PageBuilderInterface):
         if dataset is not None: # Occurs once user uploads
             self.dataset = pd.read_csv(dataset)
             st.session_state["dataset"] = self.dataset
+            self.select_data(self.dataset)
             self.setup_data()
 
     
@@ -87,8 +88,25 @@ class DataCheckerPage(PageBuilderInterface):
         dataset = pd.concat( [X,Y], axis=1 )
         
         st.session_state["dataset"] = dataset
+        self.select_data(dataset)
         self.setup_data()
     
+    def select_data(self, dataset):
+        option1=st.sidebar.radio(
+            'What variables do you want to include in the report?',
+            ('All variables', 'A subset of variables'))
+            
+        if option1=='All Variables':
+            st.session_state["dataset"] = dataset
+        
+        elif option1=='A subset of variables':
+            var_list=list(st.session_state['dataset'].columns)
+            option3=st.sidebar.multiselect(
+                'Select variable(s) you want to include in the report.',
+                var_list)
+            st.session_state["dataset"] = dataset[option3]
+
+
      
     def check_data_option(self):
         """
@@ -175,7 +193,7 @@ class DataCheckerPage(PageBuilderInterface):
         if 'Descriptive Analysis' in st.session_state['visuals']:
             st.subheader('Descriptive Analysis:')
             df = st.session_state['dataset']
-            st.dataframe(df.describe())
+            st.dataframe(df.describe(include = 'all'))
     
      
     def get_target_analysis(self):
