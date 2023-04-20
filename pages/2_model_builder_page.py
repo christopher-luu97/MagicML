@@ -3,11 +3,18 @@ import pandas as pd
 import numpy as np
 import base64
 import plotly.graph_objects as go
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import load_diabetes
+from sklearn import linear_model
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.ensemble import (RandomForestRegressor, ExtraTreesRegressor, RandomForestRegressor, 
+                                BaggingRegressor, GradientBoostingRegressor)
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import metrics
 
 #---------------------------------#
 # Page layout
@@ -63,6 +70,19 @@ st.subheader('Dataset')
 
 #---------------------------------#
 # Model building
+def MAPE (y_test, y_pred):
+    """
+    Mean Absolute Percentage Error
+
+    Args:
+        y_test (series): Data for predicting test on
+        y_pred (series): Predicted outcomes
+
+    Returns:
+        (float): The mean absolute percentage error
+    """
+    y_test, y_pred = np.array(y_test), np.array(y_pred)
+    return np.mean(np.abs((y_test - y_pred) / y_test)) * 100
 
 def filedownload(df):
     csv = df.to_csv(index=False)
@@ -81,31 +101,131 @@ def build_model(X,Y):#df):
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=split_size)
     #X_train.shape, Y_train.shape
     #X_test.shape, Y_test.shape
+    
+    modelmlg = LinearRegression()
+    modeldcr = DecisionTreeRegressor()
+    modelbag = BaggingRegressor()
+    modelrfr = RandomForestRegressor()
+    modelXGR = xgb.XGBRegressor()
+    modelKNN = KNeighborsRegressor(n_neighbors=5)
+    modelETR = ExtraTreesRegressor()
+    modelRE=Ridge()
+    modelLO=linear_model.Lasso(alpha=0.1)
+    
+    modelGBR = GradientBoostingRegressor(loss='squared_error', learning_rate=0.1, n_estimators=100, subsample=1.0,
+                                          criterion='friedman_mse', min_samples_split=2, min_samples_leaf=1,
+                                          min_weight_fraction_leaf=0.0, max_depth=3, min_impurity_decrease=0.0,
+                                          init=None, random_state=None, max_features=None,
+                                          alpha=0.9, verbose=0, max_leaf_nodes=None, warm_start=False,
+                                          validation_fraction=0.1, n_iter_no_change=None, tol=0.0001, ccp_alpha=0.0)
 
-    rf = RandomForestRegressor(n_estimators=parameter_n_estimators,
-        random_state=parameter_random_state,
-        max_features=parameter_max_features,
-        criterion=parameter_criterion,
-        min_samples_split=parameter_min_samples_split,
-        min_samples_leaf=parameter_min_samples_leaf,
-        bootstrap=parameter_bootstrap,
-        oob_score=parameter_oob_score,
-        n_jobs=parameter_n_jobs)
+    # Evalution matrix for all the algorithms
 
-    grid = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5)
-    grid.fit(X_train, Y_train)
+    # MM = [modelmlg, modeldcr, modelrfr, modelKNN, modelETR, modelGBR, modelXGR, modelbag,modelRE,modelLO]
+    models_dict={'LinearRegression':modelmlg,'DecisionTreeRegressor':modeldcr,'RandomForestRegressor':modelrfr,
+            'KNeighborsRegressor':modelKNN,'ExtraTreesRegressor':modelETR,'GradientBoostingRegressor':modelGBR,
+            'XGBRegressor':modelXGR,'BaggingRegressor':modelbag,'Ridge Regression':modelRE,'Lasso Regression':modelLO}
+    
+    st.session_state['models_dict'] = models_dict
+
+    results_dict ={'Model Name':[], 'Mean_Absolute_Error_MAE':[] ,
+                'Root_Mean_Squared_Error_RMSE':[] ,'Mean_Absolute_Percentage_Error_MAPE':[] ,
+                'Mean_Squared_Error_MSE':[] ,'Root_Mean_Squared_Log_Error_RMSLE':[] ,'R2_score':[]}
+    results=pd.DataFrame(results_dict)
+
+    for name, models in models_dict.items():
+       models.fit(X_train, Y_train)
+       y_pred = models.predict(X_test)
+       result = MAPE(Y_test, y_pred)    
+       new_row = {'Model Name' : name,
+                'Mean_Absolute_Error_MAE' : metrics.mean_absolute_error(Y_test, y_pred),
+                'Root_Mean_Squared_Error_RMSE' : np.sqrt(metrics.mean_squared_error(Y_test, y_pred)),
+                'Mean_Absolute_Percentage_Error_MAPE' : result,
+                'Mean_Squared_Error_MSE' : metrics.mean_squared_error(Y_test, y_pred),
+                'Root_Mean_Squared_Log_Error_RMSLE': np.sqrt(np.mean(np.square(np.log1p(y_pred) - np.log1p(Y_test)))),
+                'R2_score' : metrics.r2_score(Y_test, y_pred)}
+       results = results.append(new_row, ignore_index=True)
+    st.write(results)
+
+    grid_dict ={'Model Name':[], 'R2_score':[], "MAE":[],
+                'best_max_features':[],'optimal_n_estimators':[]}
+    grid_df=pd.DataFrame(grid_dict)
+    models_dict_grid={'LinearRegression':modelmlg,'DecisionTreeRegressor':modeldcr,'RandomForestRegressor':modelrfr,
+        'KNeighborsRegressor':modelKNN,'ExtraTreesRegressor':modelETR,'GradientBoostingRegressor':modelGBR,
+        'XGBRegressor':modelXGR,'BaggingRegressor':modelbag,'Ridge Regression':modelRE,'Lasso Regression':modelLO}
+    
+    models_dict_grid_params = {
+       'LinearRegression':{},
+       'DecisionTreeRegressor':{
+                                "criterion": ["squared_error", "absolute_error"],
+                                "min_samples_split": [10, 20, 40],
+                                "max_depth": [2, 6, 8],
+                                "min_samples_leaf": [20, 40, 100],
+                                "max_leaf_nodes": [5, 20, 100],
+                                },
+       'RandomForestRegressor':{
+                                'n_estimators': [10, 20, 30], 
+                                'max_depth': [None, 1, 2, 3], 
+                                'min_samples_split': [1, 2, 3]},
+        'KNeighborsRegressor':{
+                                'n_neighbors': [2,3,4,5,6,7,], 
+                               'weights': ['uniform','distance'],
+                               'p':[1,2,5]},
+        'ExtraTreesRegressor':{
+                                # 'n_estimators': [int(x) for x in np.arange(start = 100, stop = 300, step = 100)],
+                                # 'criterion': ['squared_error', 'absolute_error'],
+                                # 'max_depth': [2,8,16,32,50],
+                                # 'min_samples_split': [2,4,6],
+                                # 'min_samples_leaf': [1,2],
+                                #  'bootstrap': [True, False],
+                                # 'warm_start': [True, False],
+                             },
+        'GradientBoostingRegressor':{
+                                      'learning_rate': [0.01,0.02,0.03,0.04],
+                                      'subsample'    : [0.9, 0.5, 0.2, 0.1],
+                                      'n_estimators' : [10,20,30,40],
+                                      'max_depth'    : [4,6,8,10]
+                                    },
+        'XGBRegressor':{
+                        'learning_rate': [.03, 0.05, .07], #so called `eta` value
+                        'max_depth': [5, 6, 7],
+                        'min_child_weight': [4],
+                        "gamma":[ 0.0, 0.1, 0.2],
+                        'subsample': [0.7],
+                        'colsample_bytree': [0.7],
+                        'n_estimators': [10]
+                        },
+        'BaggingRegressor':{
+                            # 'estimator' : [1, 2, 3, 4, 5],
+                            # 'max_samples' : [0.05, 0.1, 0.2, 0.5]
+                        },
+        'Ridge Regression':
+                          {
+                            # 'alpha':[1, 10]
+                            }
+                          ,
+        'Lasso Regression':{
+                              'alpha': np.arange(0.00, 1.0, 0.1)
+                              }
+    }
 
     st.subheader('Model Performance')
 
-    Y_pred_test = grid.predict(X_test)
-    st.write('Coefficient of determination ($R^2$):')
-    st.info( r2_score(Y_test, Y_pred_test) )
+    for key in models_dict_grid.keys(): # Loop through each model
+      grid = GridSearchCV(estimator=models_dict_grid[key], param_grid=models_dict_grid_params[key], cv=5)
+      grid.fit(X_train, Y_train)
 
-    st.write('Error (MSE or MAE):')
-    st.info( mean_squared_error(Y_test, Y_pred_test) )
-
-    st.write("The best parameters are %s with a score of %0.2f"
-      % (grid.best_params_, grid.best_score_))
+      Y_pred_test = grid.predict(X_test)
+      new_row = {'Model Name' : key,
+                'R2_score' : r2_score(Y_test, Y_pred_test),
+                'Root_Mean_Squared_Error_RMSE' : np.sqrt(metrics.mean_squared_error(Y_test, y_pred)),
+                'Mean_Squared_Error_MSE' : mean_squared_error(Y_test, Y_pred_test),
+                'best_max_features' : grid.best_params_,
+                'optimal_n_estimators':grid.best_score_}
+      print(f"\n{key} complete\n")
+      grid_df = grid_df.append(new_row, ignore_index=True)
+    
+    st.write(grid_df)
 
     st.subheader('Model Parameters')
     st.write(grid.get_params())

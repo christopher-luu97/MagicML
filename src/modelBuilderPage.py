@@ -127,18 +127,101 @@ class ModelBuilderPage(PageBuilderInterface):
             self.dataset_loader()
     
     def select_X_data(self, dataset):
-        all_cols = st.session_state["dataset"].columns.tolist()
+        all_cols = list(st.session_state["dataset"].columns)
         st.markdown('')
         st.markdown('**_Features_** you want to use')
         features_selected = st.multiselect("", all_cols)
         st.session_state['X_dataset'] = st.session_state['dataset'][features_selected]
 
     def select_Y_data(self, dataset):
-        all_cols = st.session_state["dataset"].columns.tolist()
+        all_cols = list(st.session_state["dataset"].columns.tolist())
         st.markdown('')
         st.markdown('**_Target_** you want to predict')
-        target_selected = st.multiselect("", all_cols)
+        target_selected = st.selectbox("Select Target Variable", all_cols)
         st.session_state['Y_dataset'] = st.session_state['dataset'][target_selected]
+
+    def set_models(self):
+        """
+        Define the models to be trained as well as the dictionary to loop over
+        Store the models into a dictionary of <model name> : <model object>
+        """
+        modelmlg = LinearRegression()
+        modeldcr = DecisionTreeRegressor()
+        modelbag = BaggingRegressor()
+        modelrfr = RandomForestRegressor()
+        modelXGR = xgb.XGBRegressor()
+        modelKNN = KNeighborsRegressor(n_neighbors=5)
+        modelETR = ExtraTreesRegressor()
+        modelRE=Ridge()
+        modelLO=linear_model.Lasso(alpha=0.1)
+        
+        modelGBR = GradientBoostingRegressor(loss='ls', learning_rate=0.1, n_estimators=100, subsample=1.0,
+                                             criterion='friedman_mse', min_samples_split=2, min_samples_leaf=1,
+                                             min_weight_fraction_leaf=0.0, max_depth=3, min_impurity_decrease=0.0,
+                                             init=None, random_state=None, max_features=None,
+                                             alpha=0.9, verbose=0, max_leaf_nodes=None, warm_start=False,
+                                             validation_fraction=0.1, n_iter_no_change=None, tol=0.0001, ccp_alpha=0.0)
+
+        # Evalution matrix for all the algorithms
+
+        # MM = [modelmlg, modeldcr, modelrfr, modelKNN, modelETR, modelGBR, modelXGR, modelbag,modelRE,modelLO]
+        models_dict={'LinearRegression':modelmlg,'DecisionTreeRegressor':modeldcr,'RandomForestRegressor':modelrfr,
+                'KNeighborsRegressor':modelKNN,'ExtraTreesRegressor':modelETR,'GradientBoostingRegressor':modelGBR,
+                'XGBRegressor':modelXGR,'BaggingRegressor':modelbag,'Ridge Regression':modelRE,'Lasso Regression':modelLO}
+        
+        st.session_state['models_dict'].models_dict = models_dict
+
+    def MAPE (self, y_test, y_pred):
+        """
+        Mean Absolute Percentage Error
+
+        Args:
+            y_test (series): Data for predicting test on
+            y_pred (series): Predicted outcomes
+        
+        Returns:
+            (float): The mean absolute percentage error
+        """
+        y_test, y_pred = np.array(y_test), np.array(y_pred)
+        return np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+    
+    def fit_model(self, test_param: str):
+        """
+        Iterate through a defined set of models and add them to a dictionary
+
+        Args:
+            test_param (str): Either validation or test
+            
+        Returns:
+            results (pd.DataFrame): Dataframe with results from each model per row 
+        
+        """
+        results_dict ={'Model Name':[], 'Mean_Absolute_Error_MAE':[] ,
+                   'Root_Mean_Squared_Error_RMSE':[] ,'Mean_Absolute_Percentage_Error_MAPE':[] ,
+                   'Mean_Squared_Error_MSE':[] ,'Root_Mean_Squared_Log_Error_RMSLE':[] ,'R2_score':[]}
+        results=pd.DataFrame(results_dict)
+        
+        if test_param == "validation":
+            X_2 = self.X_val
+            y_2 = self.y_val
+        elif test_param == "test":
+            X_2 = self.X_test
+            y_2 = self.y_test
+        for name, models in self.models_dict.items():
+            models.fit(self.X_train, self.y_train)
+            y_pred = models.predict(X_2)
+
+            # Metrics
+            result = self.MAPE(y_2, y_pred)    
+            new_row = {'Model Name' : name,
+                       'Mean_Absolute_Error_MAE' : metrics.mean_absolute_error(y_2, y_pred),
+                       'Root_Mean_Squared_Error_RMSE' : np.sqrt(metrics.mean_squared_error(y_2, y_pred)),
+                       'Mean_Absolute_Percentage_Error_MAPE' : result,
+                       'Mean_Squared_Error_MSE' : metrics.mean_squared_error(y_2, y_pred),
+                       'Root_Mean_Squared_Log_Error_RMSLE': np.sqrt(np.mean(np.square(np.log1p(y_pred) - np.log1p(y_2)))),
+                       'R2_score' : metrics.r2_score(y_2, y_pred)}
+            results = results.append(new_row, ignore_index=True)
+            return results
 
 
 # Page layout
