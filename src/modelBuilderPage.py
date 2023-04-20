@@ -3,13 +3,144 @@ import pandas as pd
 import numpy as np
 import base64
 import plotly.graph_objects as go
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import load_diabetes
+from sklearn import linear_model
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.ensemble import (RandomForestRegressor, ExtraTreesRegressor, RandomForestRegressor, 
+                                BaggingRegressor, GradientBoostingRegressor)
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import metrics
+import pickle
+import os
 
-#---------------------------------#
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+import src.util as functions
+from src.pageBuilder import PageBuilderInterface
+from src.tabularDataProcessor import TDProcessor
+
+
+class ModelBuilderPage(PageBuilderInterface):
+    """
+    Contains the logic to present everything requried for the EDA page
+
+    Args:
+        PageBuilderInterface (ABC): Interface class
+    """
+    st.set_page_config(layout = "wide", page_title = 'Model Builder')
+
+    def __init__(self):
+        self.TDP = TDProcessor() # Processor class
+        
+        # Set session states for persistence
+        # Done to allow for OOP instead of procedural programming
+        if 'dataset' not in st.session_state:
+            st.session_state['dataset'] = pd.DataFrame()
+        
+        if 'visuals' not in st.session_state:
+            st.session_state['visuals'] = []
+
+        if 'num_columns' not in st.session_state:
+            st.session_state['num_columns'] = []
+        
+        if 'cat_columns' not in st.session_state:
+            st.session_state['cat_columns'] = []
+    
+    def app(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        self.set_config()
+
+    def set_config(self):
+        """
+        Set the page layout
+        """
+        st.header("Exploratory Data Analysis Tool")
+        functions.space()
+
+        st.sidebar.header('Import Dataset to Use Available Features: ')
+        st.write('<p style="font-size:130%">Import Dataset (CSV only)</p>', unsafe_allow_html=True)
+
+        use_defo = st.checkbox('Use example Dataset', value=True)
+
+        if use_defo:
+            diabetes = load_diabetes()
+            X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+            Y = pd.Series(diabetes.target, name='response')
+            dataset = pd.concat( [X,Y], axis=1 )
+        
+        if "dataset" not in st.session_state:
+            st.session_state["dataset"] = dataset
+            df = st.session_state['dataset']
+        else:
+            df = dataset
+
+        st.markdown('The **Diabetes** dataset is used as the example.')
+        st.write(df.head(5))
+
+    def dataset_loader(self):
+        """
+        Load a datset from the user's file upload
+        """
+        dataset = st.file_uploader(
+                        label="Choose your input file",
+                        type=['csv'],
+                        accept_multiple_files=False,
+                        )  
+        if dataset is not None: # Occurs once user uploads
+            self.dataset = pd.read_csv(dataset)
+            st.session_state["dataset"] = self.dataset
+            self.select_data(self.dataset)
+            self.setup_data()
+    
+    def use_default_data(self):
+        """
+        Load the default diabetes dataset that comes with sklearn
+        """
+        diabetes = load_diabetes()
+        X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+        Y = pd.Series(diabetes.target, name='response')
+        dataset = pd.concat( [X,Y], axis=1 )
+        
+        st.session_state["dataset"] = dataset
+        self.select_data(dataset)
+        self.setup_data()
+
+     
+    def check_data_option(self):
+        """
+        Check if user wants to use default dataset or load their own
+        """
+        use_defo = st.checkbox('Use example Dataset')
+        if use_defo:
+            self.use_default_data()
+        else:
+            self.dataset_loader()
+    
+    def select_X_data(self, dataset):
+        all_cols = st.session_state["dataset"].columns.tolist()
+        st.markdown('')
+        st.markdown('**_Features_** you want to use')
+        features_selected = st.multiselect("", all_cols)
+        st.session_state['X_dataset'] = st.session_state['dataset'][features_selected]
+
+    def select_Y_data(self, dataset):
+        all_cols = st.session_state["dataset"].columns.tolist()
+        st.markdown('')
+        st.markdown('**_Target_** you want to predict')
+        target_selected = st.multiselect("", all_cols)
+        st.session_state['Y_dataset'] = st.session_state['dataset'][target_selected]
+
+
 # Page layout
 ## Page expands to full width
 st.set_page_config(page_title='The Machine Learning Hyperparameter Optimization App',
@@ -70,9 +201,9 @@ def filedownload(df):
     href = f'<a href="data:file/csv;base64,{b64}" download="model_performance.csv">Download CSV File</a>'
     return href
 
-def build_model(X,Y):#df):
-    # X = df.iloc[:,:-1] # Using all column except for the last column as X
-    # Y = df.iloc[:,-1] # Selecting the last column as Y
+def build_model(df):
+    X = df.iloc[:,:-1] # Using all column except for the last column as X
+    Y = df.iloc[:,-1] # Selecting the last column as Y
 
     st.markdown('A model is being built to predict the following **Y** variable:')
     st.info(Y.name)
@@ -99,10 +230,10 @@ def build_model(X,Y):#df):
 
     Y_pred_test = grid.predict(X_test)
     st.write('Coefficient of determination ($R^2$):')
-    st.info( r2_score(Y_test, Y_pred_test) )
+    st.info( metrics.r2_score(Y_test, Y_pred_test) )
 
     st.write('Error (MSE or MAE):')
-    st.info( mean_squared_error(Y_test, Y_pred_test) )
+    st.info( metrics.mean_squared_error(Y_test, Y_pred_test) )
 
     st.write("The best parameters are %s with a score of %0.2f"
       % (grid.best_params_, grid.best_score_))
@@ -160,36 +291,33 @@ else:
     use_defo = st.checkbox('Use example Dataset', value=True)
 
     if use_defo:
-      diabetes = load_diabetes()
-      X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
-      Y = pd.Series(diabetes.target, name='response')
-      dataset = pd.concat( [X,Y], axis=1 )
-      
-      if "dataset" not in st.session_state:
-          st.session_state["dataset"] = dataset
-          df = st.session_state['dataset']
-      else:
-         df = dataset
+        diabetes = load_diabetes()
+        X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+        Y = pd.Series(diabetes.target, name='response')
+        dataset = pd.concat( [X,Y], axis=1 )
 
-      st.markdown('The **Diabetes** dataset is used as the example.')
-      st.write(df.head(5))
+    if "dataset" not in st.session_state:
+        st.session_state["dataset"] = dataset
+        df = st.session_state['dataset']
+    else:
+        df = dataset
 
-      st.markdown('')
-      st.markdown('**_Features_** you want to use')
-      all_cols = list(st.session_state["dataset"].columns)
-      option3=st.sidebar.multiselect(
-          'Select variable(s) you want to include in the report.',
-          all_cols)
-      st.session_state["X_dataset"] = df[option3]
-      st.write(st.session_state['X_dataset'])
+    st.markdown('The **Diabetes** dataset is used as the example.')
+    st.write(df.head(5))
 
-      option4 = st.sidebar.selectbox(
-         'Select your target variable',
-         all_cols
-      )
-      st.session_state["Y_dataset"] = df[option4]
-      st.write(st.session_state['Y_dataset'])
-      if st.checkbox('Build model', value=False):
-        X = st.session_state['X_dataset']
-        Y = st.session_state['Y_dataset']
-        build_model(X, Y)
+    all_cols = st.session_state["dataset"].columns.tolist()
+    st.markdown('')
+    st.markdown('**_Features_** you want to use')
+    features_selected = st.multiselect("", all_cols)
+    st.session_state['X_dataset'] = st.session_state['dataset'][features_selected]
+
+    st.markdown('')
+    st.markdown('**_Target_** you want to predict')
+    target_selected = st.multiselect("", all_cols)
+    st.session_state['Y_dataset'] = st.session_state['dataset'][target_selected]
+
+    st.write(st.session_state['Y_dataset'])
+    st.write(st.session_state['X_dataset'])
+
+    if st.checkbox('Build model', value=False):
+        build_model(df)
