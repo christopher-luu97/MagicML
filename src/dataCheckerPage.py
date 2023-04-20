@@ -41,6 +41,7 @@ class DataCheckerPage(PageBuilderInterface):
         """
         self.set_config()
         self.check_data_option()
+        self.profiler()
         self.get_info()
         self.get_NA_info()
         self.get_descriptive_analysis()
@@ -412,6 +413,15 @@ class DataCheckerPage(PageBuilderInterface):
                         for i in high_cardi_columns:
                             self.plot_box_plot(df_1, target_column, i)
 
+    def profiler(self):
+        import ydata_profiling
+        from streamlit_pandas_profiling import st_profile_report
+        use_defo = st.checkbox('Data Profiler')
+        if use_defo:
+            df = st.session_state['dataset']
+            report = ydata_profiling.ProfileReport(df)
+            st_profile_report(report)
+       
     # def test(self):
     #     st.session_state
     #     st.write(f"{st.session_state['visuals']}")
