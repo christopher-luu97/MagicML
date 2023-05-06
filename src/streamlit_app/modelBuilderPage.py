@@ -21,9 +21,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-import src.util as functions
-from src.pageBuilder import PageBuilderInterface
-from src.tabularDataProcessor import TDProcessor
+import src.streamlit_app.util as functions
+from src.streamlit_app.pageBuilder import PageBuilderInterface
+from src.utils.tabularDataProcessor import TDProcessor
 
 
 class ModelBuilderPage(PageBuilderInterface):

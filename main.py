@@ -5,9 +5,9 @@ import os
 from PyQt6.QtWidgets import (QMainWindow, QApplication, QStackedWidget)
 from PyQt6.QtCore import *
 
-from src.mainWIndow import MainWindow
-from src.splashWindow import splashWindow
-from src.signals import PageWindow
+from src.qt_app.mainWIndow import MainWindow
+from src.qt_app.splashWindow import splashWindow
+from src.qt_app.signals import PageWindow
 
 class Window(QMainWindow):
     def __init__(self, parent=None):
