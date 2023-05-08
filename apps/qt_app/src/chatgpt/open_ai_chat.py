@@ -1,6 +1,19 @@
 import os
 import openai
+import json
+import sys
 
+def get_key() -> str:
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
+    base_dir = os.path.dirname(sys.argv[0])
+    creds_dir = os.path.join(base_dir, "config", "secrets.json")
+    with open(creds_dir, "r") as f:
+        config = json.load(f)
+        return config['oai_credentials']
 
 
 def get_response(input_str):
@@ -9,7 +22,8 @@ def get_response(input_str):
     :param input_str:
     :return:
     """
-    __key = "Your key"
+    print("yo")
+    __key = get_key()
 
     openai.api_key = __key
 

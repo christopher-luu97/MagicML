@@ -3,7 +3,7 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication
 
-from app_main import MainWindow
+from src.app_main import MainWindow
 
 if __name__ == '__main__':
     flag = os.path.exists("datas/data.json")

@@ -9,12 +9,13 @@ from PyQt6.QtGui import QIcon, QStandardItemModel, QStandardItem
 
 import os
 from PyQt6 import uic
-from home_window import HomeWindow
-from chat_window import ChatWindow
-from connect_db import ConnectDB
+from src.chatgpt.home_window import HomeWindow
+from src.chatgpt.chat_window import ChatWindow
+from src.chatgpt.connect_db import ConnectDB
 # from widgets.chat_window_ui import Ui_Form as Chat_Form
+from .signals import PageWindow
 
-import open_ai_chat
+import src.chatgpt.open_ai_chat as open_ai_chat
 
 
 class CustomWidget(QWidget):
@@ -81,7 +82,7 @@ class CustomWidget(QWidget):
         layout.addWidget(delete_btn)
 
 
-class MainWindow(QMainWindow):
+class MainWindow(PageWindow):
     def __init__(self):
         super().__init__()
 
@@ -143,7 +144,7 @@ class MainWindow(QMainWindow):
     def on_input_textEdit_textChanged(self):
         document = self.message_input.document()
         self.message_input.setFixedHeight(int(document.size().height()))
-        self.input_frame.setFixedHeight(int(document.size().height() + 18))
+        # self.input_frame.setFixedHeight(int(document.size().height() + 18))
 
     ## Functions for chat list ///////////////////////////////
     # Delete a chat form chat list
@@ -445,3 +446,14 @@ class MainWindow(QMainWindow):
             # msg_box.setStyleSheet("QPushButton{text-align: center;}")
             # msg_box.information(self, "Note", "Please input content first.")
             return
+    
+    def make_handleButton(self, button):
+        """_summary_
+
+        Args:
+            button (_type_): _description_
+        """
+        def handleButton():
+            if button == 'navToTranscribePage':
+                self.goto("transcribe")
+        return handleButton
