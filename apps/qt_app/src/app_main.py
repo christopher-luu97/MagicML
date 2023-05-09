@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (QMainWindow, QPushButton, QWidget,
                              QHBoxLayout, QLineEdit, QGridLayout, QLabel, QFrame,
                              QTextEdit, QScrollArea, QComboBox)
 from PyQt6.QtCore import pyqtSlot, Qt
-from PyQt6.QtGui import QIcon, QStandardItemModel, QStandardItem
+from PyQt6.QtGui import QIcon, QStandardItemModel, QStandardItem, QAction
 
 import os
 from PyQt6 import uic
@@ -92,6 +92,13 @@ class MainWindow(PageWindow):
         
         ui = uic.loadUi(ui_dir, self)
         self.ui = ui
+        self.chatgpt_window = self.findChild(QAction, 'actionChatGPT')
+
+        self.transcribe_window = self.findChild(QAction, 'actionTranscribe')
+        self.transcribe_window.triggered.connect(self.navigate_to_transcribe)
+
+        self.pushbutton10 = self.findChild(QPushButton, 'pushButton_10')
+        self.pushbutton10.clicked.connect(self.make_handleButton("navToTranscribePage"))
 
         # Instantiate the database object
         self.connect_db = ConnectDB()
@@ -446,6 +453,11 @@ class MainWindow(PageWindow):
             # msg_box.setStyleSheet("QPushButton{text-align: center;}")
             # msg_box.information(self, "Note", "Please input content first.")
             return
+        
+    def navigate_to_transcribe(self):
+        """_summary_
+        """
+        self.goto("transcribe")
     
     def make_handleButton(self, button):
         """_summary_

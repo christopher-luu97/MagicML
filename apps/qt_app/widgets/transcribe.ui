@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1342</width>
+    <height>805</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ChatGPT</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../../src/qt_app/static/resource.qrc">
+    <normaloff>:/icons/icons/open AI.svg</normaloff>:/icons/icons/open AI.svg</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton {
+	text-align: left;
+}
+
+
+#menu_frame QPushButton {
+	text-align: left;
+	color: #fff;
+	border: none;
+	padding:10px 10px;
+	border-radius: 5px;
+	background: none;
+}
+
+#menu_frame QFrame {
+	border-radius: 5px;
+}
+
+#new_chat_btn {
+	border: 1px solid #4d4d4f;
+	border-radius: 5px;
+	text-align: left;
+	color: #fff;
+	padding:10px;
+}
+
+
+#side_widget,
+#side_widget QPushButton,
+#chat_list {
+	background-color: #202123;
+}
+
+#side_widget QPushButton:hover,
+#chat_list::item:hover,
+#user_frame:hover,
+#menu_frame QFrame:hover
+ {
+	background-color: #2a2b32;
+}
+
+#chat_list::item:selected {
+	background-color: #343541;
+}
+
+#chat_list {
+	border: none;
+}
+
+#chat_list::item {
+	color: #fff;
+	padding: 10px;
+	border-radius: 5px;
+	margin-top:5px;
+}
+
+#chat_list_scrollArea {
+  border: none;
+}
+
+#menu_frame {
+	border-top: 0.5px solid #4d4d4f;
+}
+
+ QScrollBar:vertical {
+     border: none;
+     background: #202123;
+     width: 8px;
+     margin: 0;
+	border-radius: 4px;
+ }
+ QScrollBar::handle:vertical {
+     background: #565869;
+     min-height: 20px;
+	 border-radius: 4px;
+ }
+
+ QScrollBar::add-line:vertical {
+     border:none;
+     background: #202123;
+     subcontrol-position: bottom;
+     subcontrol-origin: margin;
+ }
+
+ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+     background: none;
+ }
+
+QScrollBar::handle:hover {	
+	background-color: #acacbe;
+}
+
+
+#comboBox  {
+border: none;
+background: transparent;
+color: #fff;
+}
+
+#comboBox:editable {
+	background: transparent;
+}
+
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1342</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuUses">
+    <property name="title">
+     <string>Uses</string>
+    </property>
+    <addaction name="actionChatGPT"/>
+    <addaction name="actionTranscribe"/>
+   </widget>
+   <addaction name="menuUses"/>
+  </widget>
+  <action name="actionTranscribe">
+   <property name="text">
+    <string>Transcribe</string>
+   </property>
+  </action>
+  <action name="actionChatGPT">
+   <property name="text">
+    <string>ChatGPT</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../src/qt_app/static/resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

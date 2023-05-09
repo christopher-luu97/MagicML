@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.tabularDataProcessor import TDProcessor
+from apps.tabularDataProcessor import TDProcessor
 
 @pytest.fixture
 def sample_df():

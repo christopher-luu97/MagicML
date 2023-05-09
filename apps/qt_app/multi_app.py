@@ -60,6 +60,7 @@ if __name__ == "__main__":
     app.setStyleSheet(style)
     sp = splashWindow()
     sp.show()
+    sp.progress()
     w = Window()
     w.show()
     sys.exit(app.exec())

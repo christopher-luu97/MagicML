@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from sklearn.datasets import load_diabetes
 
-import src.util as functions
+import apps.util as functions
 st.set_page_config(layout = "wide", page_title='EDA')
 
 

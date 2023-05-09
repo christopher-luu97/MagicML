@@ -3,3 +3,4 @@ database/credentials.json
 requirements copy.txt
 *.exe
 apps/qt_app/config/
+*.pdf

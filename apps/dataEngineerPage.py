@@ -3,9 +3,9 @@ import pandas as pd
 import plotly.express as px
 from sklearn.datasets import load_diabetes
 
-import src.util as functions
-from src.pageBuilder import PageBuilderInterface
-from src.tabularDataProcessor import TDProcessor
+import apps.util as functions
+from apps.pageBuilder import PageBuilderInterface
+from apps.tabularDataProcessor import TDProcessor
 
 
 class DataCheckerPage(PageBuilderInterface):

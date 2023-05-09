@@ -14,7 +14,7 @@
    <string>ChatGPT</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../static/resource.qrc">
+   <iconset resource="../../../src/qt_app/static/resource.qrc">
     <normaloff>:/icons/icons/open AI.svg</normaloff>:/icons/icons/open AI.svg</iconset>
   </property>
   <property name="styleSheet">
@@ -195,7 +195,7 @@ color: #fff;
              <string>New Chat</string>
             </property>
             <property name="icon">
-             <iconset resource="../static/resource.qrc">
+             <iconset resource="../../../src/qt_app/static/resource.qrc">
               <normaloff>:/icons/icons/add_google_icon.svg</normaloff>:/icons/icons/add_google_icon.svg</iconset>
             </property>
             <property name="iconSize">
@@ -308,7 +308,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/delete.svg</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/delete.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -369,7 +369,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/user.svg</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/user.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -455,7 +455,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/robot.svg</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/robot.svg</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -556,7 +556,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/dark.png</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/dark.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -611,7 +611,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/update.png</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/update.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -672,7 +672,7 @@ color: #fff;
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../static/resource.qrc">:/icons/icons/logout.png</pixmap>
+                <pixmap resource="../../../src/qt_app/static/resource.qrc">:/icons/icons/logout.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -826,7 +826,7 @@ border-radius: 5px;
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../static/resource.qrc">
+             <iconset resource="../../../src/qt_app/static/resource.qrc">
               <normaloff>:/icons/icons/send.svg</normaloff>:/icons/icons/send.svg</iconset>
             </property>
             <property name="iconSize">
@@ -917,10 +917,28 @@ border-radius: 5px;
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuUses">
+    <property name="title">
+     <string>Uses</string>
+    </property>
+    <addaction name="actionChatGPT"/>
+    <addaction name="actionTranscribe"/>
+   </widget>
+   <addaction name="menuUses"/>
   </widget>
+  <action name="actionTranscribe">
+   <property name="text">
+    <string>Transcribe</string>
+   </property>
+  </action>
+  <action name="actionChatGPT">
+   <property name="text">
+    <string>ChatGPT</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="../static/resource.qrc"/>
+  <include location="../../../src/qt_app/static/resource.qrc"/>
  </resources>
  <connections/>
 </ui>
